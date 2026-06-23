@@ -21,7 +21,11 @@
     "placeholderEmpty": "תארו את האירוע…",
     "placeholderFollowUp": "שלחו תיקון או אירוע חדש…",
     "eventMessage": "הודעת אירוע",
-    "sendMessage": "שליחת הודעה"
+    "sendMessage": "שליחת הודעה",
+    "startRecording": "הקלטת הודעה",
+    "stopRecording": "עצירת הקלטה",
+    "listening": "מאזין…",
+    "speechNotSupported": "זיהוי דיבור אינו נתמך בדפדפן זה"
   },
   "event": {
     "understood": "הנה מה שהבנתי:",

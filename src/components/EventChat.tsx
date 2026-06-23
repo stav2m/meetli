@@ -1,3 +1,5 @@
+import MicIcon from '@mui/icons-material/Mic';
+import MicNoneOutlinedIcon from '@mui/icons-material/MicNoneOutlined';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import {
@@ -9,10 +11,12 @@ import {
   Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSpeechInput } from '../hooks/useSpeechInput';
 import type { ChatMessage } from '../types/chat';
 import EventBubble from './EventBubble';
 
@@ -121,10 +125,17 @@ export default function EventChat({
   onSend,
   onUpdateMessage,
 }: EventChatProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const isEmpty = input.trim().length === 0;
+
+  const { listening, browserSupportsSpeechRecognition, toggleListening, stopListening } =
+    useSpeechInput({
+      language: i18n.language,
+      onTranscriptChange: setInput,
+      disabled: loading,
+    });
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -141,6 +152,7 @@ export default function EventChat({
       return;
     }
 
+    stopListening();
     onSend(trimmed);
     setInput('');
   };
@@ -221,9 +233,13 @@ export default function EventChat({
           value={input}
           onChange={(event) => setInput(event.target.value)}
           placeholder={
-            messages.length > 0 ? t('chat.placeholderFollowUp') : t('chat.placeholderEmpty')
+            listening
+              ? t('chat.listening')
+              : messages.length > 0
+                ? t('chat.placeholderFollowUp')
+                : t('chat.placeholderEmpty')
           }
-          disabled={loading}
+          disabled={loading || listening}
           aria-label={t('chat.eventMessage')}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -235,6 +251,40 @@ export default function EventChat({
             input: {
               endAdornment: (
                 <InputAdornment position="end">
+                  <Tooltip
+                    title={
+                      browserSupportsSpeechRecognition
+                        ? listening
+                          ? t('chat.stopRecording')
+                          : t('chat.startRecording')
+                        : t('chat.speechNotSupported')
+                    }
+                  >
+                    <span>
+                      <IconButton
+                        type="button"
+                        color={listening ? 'error' : 'default'}
+                        disabled={loading || !browserSupportsSpeechRecognition}
+                        aria-label={
+                          listening ? t('chat.stopRecording') : t('chat.startRecording')
+                        }
+                        onClick={() => toggleListening(input)}
+                        sx={
+                          listening
+                            ? {
+                                animation: 'pulse 1.5s ease-in-out infinite',
+                                '@keyframes pulse': {
+                                  '0%, 100%': { opacity: 1 },
+                                  '50%': { opacity: 0.5 },
+                                },
+                              }
+                            : undefined
+                        }
+                      >
+                        {listening ? <MicIcon /> : <MicNoneOutlinedIcon />}
+                      </IconButton>
+                    </span>
+                  </Tooltip>
                   <IconButton
                     type="submit"
                     color="primary"

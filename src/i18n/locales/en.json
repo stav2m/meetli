@@ -21,7 +21,11 @@
     "placeholderEmpty": "Describe your event…",
     "placeholderFollowUp": "Send a correction or new event…",
     "eventMessage": "Event message",
-    "sendMessage": "Send message"
+    "sendMessage": "Send message",
+    "startRecording": "Record message",
+    "stopRecording": "Stop recording",
+    "listening": "Listening…",
+    "speechNotSupported": "Speech recognition is not supported in this browser"
   },
   "event": {
     "understood": "Here's what I understood:",
