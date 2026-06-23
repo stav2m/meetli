@@ -1,6 +1,6 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, type ThemeOptions } from '@mui/material/styles';
 
-export const theme = createTheme({
+export const baseThemeOptions: ThemeOptions = {
   palette: {
     mode: 'light',
     primary: {
@@ -54,4 +54,13 @@ export const theme = createTheme({
       },
     },
   },
-});
+};
+
+export function createAppTheme(direction: 'ltr' | 'rtl' = 'ltr') {
+  return createTheme({
+    ...baseThemeOptions,
+    direction,
+  });
+}
+
+export const theme = createAppTheme('ltr');

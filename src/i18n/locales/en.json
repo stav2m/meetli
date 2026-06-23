@@ -1,0 +1,66 @@
+{
+  "app": {
+    "title": "Meetli",
+    "subtitle": "Create calendar events using natural language."
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "he": "עברית"
+  },
+  "auth": {
+    "signedIn": "Signed in with Google",
+    "signOut": "Sign out",
+    "signIn": "Sign in with Google"
+  },
+  "chat": {
+    "welcome": "Describe an event to get started",
+    "example": "e.g. \"Meeting with Dana tomorrow at 2pm\"",
+    "followUp": "Send follow-up messages to fix anything",
+    "understanding": "Understanding your event…",
+    "placeholderEmpty": "Describe your event…",
+    "placeholderFollowUp": "Send a correction or new event…",
+    "eventMessage": "Event message",
+    "sendMessage": "Send message"
+  },
+  "event": {
+    "understood": "Here's what I understood:",
+    "title": "Title",
+    "calendar": "Calendar",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration",
+    "addedTo": "Added to your {{calendar}}.",
+    "viewEvent": "View event",
+    "adding": "Adding…",
+    "addTo": "Add to {{calendar}}",
+    "signInToAdd": "Sign in to add to calendar",
+    "openInGoogle": "Open in Google Calendar",
+    "notRight": "Not right? Send another message to correct it."
+  },
+  "calendar": {
+    "personal": "Personal calendar",
+    "family": "Family calendar"
+  },
+  "duration": {
+    "minutes": "{{count}} minutes",
+    "oneHour": "1 hour",
+    "hours": "{{count}} hours",
+    "hoursMinutes": "{{hours}}h {{minutes}}m"
+  },
+  "history": {
+    "title": "Title",
+    "calendar": "Calendar",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "signInRequired": "Sign in with Google to create calendar events.",
+    "invalidMessage": "Missing or invalid message.",
+    "createFailed": "Failed to create calendar event.",
+    "authNotConfigured": "Google Calendar login is not configured.",
+    "signOutFailed": "Could not sign out."
+  }
+}

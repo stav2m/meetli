@@ -1,0 +1,66 @@
+{
+  "app": {
+    "title": "Meetli",
+    "subtitle": "צרו אירועי יומן בשפה טבעית."
+  },
+  "language": {
+    "label": "שפה",
+    "en": "English",
+    "he": "עברית"
+  },
+  "auth": {
+    "signedIn": "מחובר עם Google",
+    "signOut": "התנתקות",
+    "signIn": "התחברות עם Google"
+  },
+  "chat": {
+    "welcome": "תארו אירוע כדי להתחיל",
+    "example": "לדוגמה: \"פגישה עם דנה מחר ב-14:00\"",
+    "followUp": "שלחו הודעות המשך כדי לתקן פרטים",
+    "understanding": "מבין את האירוע…",
+    "placeholderEmpty": "תארו את האירוע…",
+    "placeholderFollowUp": "שלחו תיקון או אירוע חדש…",
+    "eventMessage": "הודעת אירוע",
+    "sendMessage": "שליחת הודעה"
+  },
+  "event": {
+    "understood": "הנה מה שהבנתי:",
+    "title": "כותרת",
+    "calendar": "יומן",
+    "date": "תאריך",
+    "time": "שעה",
+    "duration": "משך",
+    "addedTo": "נוסף ל{{calendar}} שלך.",
+    "viewEvent": "צפייה באירוע",
+    "adding": "מוסיף…",
+    "addTo": "הוספה ל{{calendar}}",
+    "signInToAdd": "התחברו כדי להוסיף ליומן",
+    "openInGoogle": "פתיחה ב-Google Calendar",
+    "notRight": "לא מדויק? שלחו הודעה נוספת לתיקון."
+  },
+  "calendar": {
+    "personal": "יומן אישי",
+    "family": "יומן משפחתי"
+  },
+  "duration": {
+    "minutes": "{{count}} דקות",
+    "oneHour": "שעה",
+    "hours": "{{count}} שעות",
+    "hoursMinutes": "{{hours}} שעות ו-{{minutes}} דקות"
+  },
+  "history": {
+    "title": "כותרת",
+    "calendar": "יומן",
+    "date": "תאריך",
+    "time": "שעה",
+    "duration": "משך"
+  },
+  "errors": {
+    "generic": "משהו השתבש. נסו שוב.",
+    "signInRequired": "התחברו עם Google כדי ליצור אירועי יומן.",
+    "invalidMessage": "הודעה חסרה או לא תקינה.",
+    "createFailed": "יצירת אירוע היומן נכשלה.",
+    "authNotConfigured": "התחברות ל-Google Calendar לא מוגדרת.",
+    "signOutFailed": "לא ניתן להתנתק."
+  }
+}

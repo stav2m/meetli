@@ -1,6 +1,7 @@
 import GoogleIcon from '@mui/icons-material/Google';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { signInWithGoogle, signOut } from '../services/auth';
 
 interface GoogleAuthButtonProps {
@@ -14,6 +15,8 @@ export default function GoogleAuthButton({
   loading,
   onAuthChange,
 }: GoogleAuthButtonProps) {
+  const { t } = useTranslation();
+
   const handleSignOut = async () => {
     await signOut();
     onAuthChange();
@@ -31,7 +34,7 @@ export default function GoogleAuthButton({
     return (
       <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', justifyContent: 'center' }}>
         <Typography variant="body2" color="text.secondary">
-          Signed in with Google
+          {t('auth.signedIn')}
         </Typography>
         <Button
           size="small"
@@ -40,7 +43,7 @@ export default function GoogleAuthButton({
           onClick={handleSignOut}
           sx={{ textTransform: 'none' }}
         >
-          Sign out
+          {t('auth.signOut')}
         </Button>
       </Stack>
     );
@@ -53,7 +56,7 @@ export default function GoogleAuthButton({
       onClick={() => signInWithGoogle()}
       sx={{ textTransform: 'none' }}
     >
-      Sign in with Google
+      {t('auth.signIn')}
     </Button>
   );
 }

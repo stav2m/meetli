@@ -12,6 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ChatMessage } from '../types/chat';
 import EventBubble from './EventBubble';
 
@@ -81,28 +82,32 @@ function AssistantBubble({ children }: { children: React.ReactNode }) {
 }
 
 function WelcomeState() {
+  const { t } = useTranslation();
+
   return (
     <Box sx={{ textAlign: 'center', py: 5, px: 2 }}>
       <Typography variant="body1" color="text.secondary" gutterBottom>
-        Describe an event to get started
+        {t('chat.welcome')}
       </Typography>
       <Typography variant="body2" color="text.disabled">
-        e.g. &ldquo;Meeting with Dana tomorrow at 2pm&rdquo;
+        {t('chat.example')}
       </Typography>
       <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 2 }}>
-        Send follow-up messages to fix anything
+        {t('chat.followUp')}
       </Typography>
     </Box>
   );
 }
 
 function TypingIndicator() {
+  const { t } = useTranslation();
+
   return (
     <AssistantBubble>
       <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', py: 0.5 }}>
         <CircularProgress size={16} />
         <Typography variant="body2" color="text.secondary">
-          Understanding your event…
+          {t('chat.understanding')}
         </Typography>
       </Stack>
     </AssistantBubble>
@@ -116,6 +121,7 @@ export default function EventChat({
   onSend,
   onUpdateMessage,
 }: EventChatProps) {
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const isEmpty = input.trim().length === 0;
@@ -215,12 +221,10 @@ export default function EventChat({
           value={input}
           onChange={(event) => setInput(event.target.value)}
           placeholder={
-            messages.length > 0
-              ? 'Send a correction or new event…'
-              : 'Describe your event…'
+            messages.length > 0 ? t('chat.placeholderFollowUp') : t('chat.placeholderEmpty')
           }
           disabled={loading}
-          aria-label="Event message"
+          aria-label={t('chat.eventMessage')}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
               event.preventDefault();
@@ -235,13 +239,9 @@ export default function EventChat({
                     type="submit"
                     color="primary"
                     disabled={isEmpty || loading}
-                    aria-label="Send message"
+                    aria-label={t('chat.sendMessage')}
                   >
-                    {loading ? (
-                      <CircularProgress size={22} />
-                    ) : (
-                      <SendIcon />
-                    )}
+                    {loading ? <CircularProgress size={22} /> : <SendIcon />}
                   </IconButton>
                 </InputAdornment>
               ),

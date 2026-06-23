@@ -16,10 +16,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { createCalendarEvent } from '../services/createCalendarEvent';
 import { signInWithGoogle } from '../services/auth';
 import type { AssistantEventMessage, ChatMessage } from '../types/chat';
 import { formatCalendar, formatDate, formatDuration, formatTime } from '../utils/formatEvent';
+import { translateError } from '../utils/translateError';
 
 interface EventBubbleProps {
   message: AssistantEventMessage;
@@ -54,7 +56,10 @@ export default function EventBubble({
   authenticated,
   onUpdateMessage,
 }: EventBubbleProps) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.startsWith('he') ? 'he-IL' : 'en-US';
   const { event, createdLink, creating, createError } = message;
+  const calendarLabel = formatCalendar(event.calendar, t);
 
   const handleCreateInCalendar = async () => {
     onUpdateMessage(message.id, { creating: true, createError: null });
@@ -67,10 +72,11 @@ export default function EventBubble({
         createError: null,
       });
     } catch (err) {
+      const rawMessage = err instanceof Error ? err.message : t('errors.generic');
+
       onUpdateMessage(message.id, {
         creating: false,
-        createError:
-          err instanceof Error ? err.message : 'Something went wrong. Please try again.',
+        createError: translateError(rawMessage, t),
       });
     }
   };
@@ -78,30 +84,34 @@ export default function EventBubble({
   return (
     <Stack spacing={1.5}>
       <Typography variant="body2" color="text.secondary">
-        Here&apos;s what I understood:
+        {t('event.understood')}
       </Typography>
 
       <Stack spacing={1.25}>
-        <DetailRow icon={<TitleIcon sx={{ fontSize: 16 }} />} label="Title" value={event.title} />
+        <DetailRow
+          icon={<TitleIcon sx={{ fontSize: 16 }} />}
+          label={t('event.title')}
+          value={event.title}
+        />
         <DetailRow
           icon={<CalendarMonthIcon sx={{ fontSize: 16 }} />}
-          label="Calendar"
-          value={formatCalendar(event.calendar)}
+          label={t('event.calendar')}
+          value={calendarLabel}
         />
         <DetailRow
           icon={<CalendarTodayIcon sx={{ fontSize: 16 }} />}
-          label="Date"
-          value={formatDate(event.date)}
+          label={t('event.date')}
+          value={formatDate(event.date, locale)}
         />
         <DetailRow
           icon={<AccessTimeIcon sx={{ fontSize: 16 }} />}
-          label="Time"
-          value={formatTime(event.time)}
+          label={t('event.time')}
+          value={formatTime(event.time, locale)}
         />
         <DetailRow
           icon={<HourglassEmptyIcon sx={{ fontSize: 16 }} />}
-          label="Duration"
-          value={formatDuration(event.duration)}
+          label={t('event.duration')}
+          value={formatDuration(event.duration, t)}
         />
       </Stack>
 
@@ -119,14 +129,14 @@ export default function EventBubble({
             '& .MuiAlert-icon': { color: 'success.main' },
           }}
         >
-          Added to your {formatCalendar(event.calendar).toLowerCase()}.{' '}
+          {t('event.addedTo', { calendar: calendarLabel })}{' '}
           <Link
             href={createdLink}
             target="_blank"
             rel="noopener noreferrer"
             sx={{ fontWeight: 600 }}
           >
-            View event
+            {t('event.viewEvent')}
           </Link>
         </Alert>
       ) : (
@@ -152,7 +162,7 @@ export default function EventBubble({
               }
               onClick={handleCreateInCalendar}
             >
-              {creating ? 'Adding…' : `Add to ${formatCalendar(event.calendar)}`}
+              {creating ? t('event.adding') : t('event.addTo', { calendar: calendarLabel })}
             </Button>
           ) : (
             <Button
@@ -162,7 +172,7 @@ export default function EventBubble({
               startIcon={<GoogleIcon />}
               onClick={() => signInWithGoogle(event)}
             >
-              Sign in to add to calendar
+              {t('event.signInToAdd')}
             </Button>
           )}
         </>
@@ -178,12 +188,12 @@ export default function EventBubble({
           target="_blank"
           rel="noopener noreferrer"
         >
-          Open in Google Calendar
+          {t('event.openInGoogle')}
         </Button>
       )}
 
       <Typography variant="caption" color="text.disabled">
-        Not right? Send another message to correct it.
+        {t('event.notRight')}
       </Typography>
     </Stack>
   );

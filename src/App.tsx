@@ -1,4 +1,5 @@
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
 import {
   Box,
   Card,
@@ -8,18 +9,23 @@ import {
   ThemeProvider,
   Typography,
 } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { prefixer } from 'stylis';
+import rtlPlugin from 'stylis-plugin-rtl';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import EventChat from './components/EventChat';
 import GoogleAuthButton from './components/GoogleAuthButton';
+import LanguageSelector from './components/LanguageSelector';
 import { getAuthStatus, consumePendingEvent } from './services/auth';
 import { extractEventFromText } from './services/extractEvent';
-import { theme } from './theme';
+import { createAppTheme } from './theme';
 import type {
   AssistantEventMessage,
   ChatHistoryEntry,
   ChatMessage,
 } from './types/chat';
 import { formatCalendar, formatDate, formatDuration, formatTime } from './utils/formatEvent';
+import { translateError } from './utils/translateError';
 
 function createId() {
   return crypto.randomUUID();
@@ -37,44 +43,64 @@ function getLatestEvent(messages: ChatMessage[]) {
   return null;
 }
 
-function formatEventForHistory(event: AssistantEventMessage['event']): string {
-  return [
-    `Title: ${event.title}`,
-    `Calendar: ${formatCalendar(event.calendar)}`,
-    `Date: ${formatDate(event.date)}`,
-    `Time: ${formatTime(event.time)}`,
-    `Duration: ${formatDuration(event.duration)}`,
-  ].join('\n');
-}
-
-function buildHistory(messages: ChatMessage[]): ChatHistoryEntry[] {
-  const history: ChatHistoryEntry[] = [];
-
-  for (const message of messages) {
-    if (message.role === 'user') {
-      history.push({ role: 'user', content: message.content });
-      continue;
-    }
-
-    if (message.kind === 'error') {
-      history.push({ role: 'assistant', content: message.content });
-      continue;
-    }
-
-    history.push({
-      role: 'assistant',
-      content: formatEventForHistory(message.event),
-    });
-  }
-
-  return history;
+function createEmotionCache(direction: 'ltr' | 'rtl') {
+  return createCache({
+    key: direction === 'rtl' ? 'muirtl' : 'muiltr',
+    stylisPlugins: direction === 'rtl' ? [prefixer, rtlPlugin] : [prefixer],
+  });
 }
 
 export default function App() {
+  const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+
+  const direction = i18n.language.startsWith('he') ? 'rtl' : 'ltr';
+  const locale = i18n.language.startsWith('he') ? 'he-IL' : 'en-US';
+
+  const theme = useMemo(() => createAppTheme(direction), [direction]);
+  const cache = useMemo(() => createEmotionCache(direction), [direction]);
+
+  const formatEventForHistory = useCallback(
+    (event: AssistantEventMessage['event']): string => {
+      return [
+        `${t('history.title')}: ${event.title}`,
+        `${t('history.calendar')}: ${formatCalendar(event.calendar, t)}`,
+        `${t('history.date')}: ${formatDate(event.date, locale)}`,
+        `${t('history.time')}: ${formatTime(event.time, locale)}`,
+        `${t('history.duration')}: ${formatDuration(event.duration, t)}`,
+      ].join('\n');
+    },
+    [t, locale],
+  );
+
+  const buildHistory = useCallback(
+    (currentMessages: ChatMessage[]): ChatHistoryEntry[] => {
+      const history: ChatHistoryEntry[] = [];
+
+      for (const message of currentMessages) {
+        if (message.role === 'user') {
+          history.push({ role: 'user', content: message.content });
+          continue;
+        }
+
+        if (message.kind === 'error') {
+          history.push({ role: 'assistant', content: message.content });
+          continue;
+        }
+
+        history.push({
+          role: 'assistant',
+          content: formatEventForHistory(message.event),
+        });
+      }
+
+      return history;
+    },
+    [formatEventForHistory],
+  );
 
   const refreshAuthStatus = useCallback(async () => {
     setAuthLoading(true);
@@ -154,99 +180,98 @@ export default function App() {
           },
         ]);
       } catch (err) {
+        const rawMessage =
+          err instanceof Error ? err.message : t('errors.generic');
+
         setMessages((current) => [
           ...current,
           {
             id: createId(),
             role: 'assistant',
             kind: 'error',
-            content:
-              err instanceof Error
-                ? err.message
-                : 'Something went wrong. Please try again.',
+            content: translateError(rawMessage, t),
           },
         ]);
       } finally {
         setLoading(false);
       }
     },
-    [messages],
+    [messages, buildHistory, t],
   );
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(160deg, #f8f9fb 0%, #e8f0fe 100%)',
-          py: { xs: 3, sm: 4 },
-          px: 2,
-        }}
-      >
-        <Container maxWidth="sm">
-          <Card
-            elevation={0}
-            sx={{
-              borderRadius: 3,
-              overflow: 'visible',
-              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            }}
-          >
-            <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
-              <Box
-                sx={{
-                  textAlign: 'center',
-                  mb: 3,
-                }}
-              >
+    <CacheProvider value={cache}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box
+          sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(160deg, #f8f9fb 0%, #e8f0fe 100%)',
+            py: { xs: 3, sm: 4 },
+            px: 2,
+          }}
+        >
+          <Container maxWidth="sm">
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+              <LanguageSelector />
+            </Box>
+
+            <Card
+              elevation={0}
+              sx={{
+                borderRadius: 3,
+                overflow: 'visible',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              }}
+            >
+              <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
                 <Box
                   sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 56,
-                    height: 56,
-                    borderRadius: '50%',
-                    bgcolor: 'primary.main',
-                    color: 'primary.contrastText',
-                    mb: 2,
-                    boxShadow: '0 4px 14px rgba(26, 115, 232, 0.4)',
+                    textAlign: 'center',
+                    mb: 3,
                   }}
                 >
-                  <CalendarMonthIcon sx={{ fontSize: 32 }} />
-                </Box>
-
-                <Typography variant="h4" component="h1" gutterBottom>
-                  Meetli
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Create calendar events using natural language.
-                </Typography>
-
-                <Box sx={{ mt: 2 }}>
-                  <GoogleAuthButton
-                    authenticated={authenticated}
-                    loading={authLoading}
-                    onAuthChange={refreshAuthStatus}
+                  <Box
+                    component="img"
+                    src="/meetli-logo-header.png"
+                    alt={t('app.title')}
+                    sx={{
+                      display: 'block',
+                      mx: 'auto',
+                      mb: 2,
+                      width: '100%',
+                      maxWidth: 280,
+                      height: 'auto',
+                    }}
                   />
-                </Box>
-              </Box>
+                  <Typography variant="body1" color="text.secondary">
+                    {t('app.subtitle')}
+                  </Typography>
 
-              <EventChat
-                messages={messages}
-                loading={loading}
-                authenticated={authenticated}
-                onSend={handleSend}
-                onUpdateMessage={handleUpdateMessage}
-              />
-            </CardContent>
-          </Card>
-        </Container>
-      </Box>
-    </ThemeProvider>
+                  <Box sx={{ mt: 2 }}>
+                    <GoogleAuthButton
+                      authenticated={authenticated}
+                      loading={authLoading}
+                      onAuthChange={refreshAuthStatus}
+                    />
+                  </Box>
+                </Box>
+
+                <EventChat
+                  messages={messages}
+                  loading={loading}
+                  authenticated={authenticated}
+                  onSend={handleSend}
+                  onUpdateMessage={handleUpdateMessage}
+                />
+              </CardContent>
+            </Card>
+          </Container>
+        </Box>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }
