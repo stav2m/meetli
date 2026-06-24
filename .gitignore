@@ -40,3 +40,6 @@ Thumbs.db
 
 # Local overrides (Vite, etc.)
 *.local
+
+# WhatsApp user data (Google tokens, conversation state)
+data/

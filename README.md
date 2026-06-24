@@ -64,6 +64,11 @@ Edit `.env` and fill in your values:
 | `SESSION_SECRET` | Random string for encrypting session cookies (use a long value in production) |
 | `FRONTEND_URL` | Frontend origin for CORS and OAuth redirects (default: `http://localhost:5173`) |
 | `PORT` | *(optional)* Backend port (default: `3001`) |
+| `BACKEND_URL` | Public URL of the API (required for WhatsApp Google sign-in links) |
+| `WHATSAPP_TOKEN` | WhatsApp Cloud API access token from Meta |
+| `WHATSAPP_PHONE_NUMBER_ID` | Phone number ID from Meta WhatsApp setup |
+| `WHATSAPP_VERIFY_TOKEN` | Random string you choose for webhook verification |
+| `WHATSAPP_APP_SECRET` | *(optional)* Meta app secret for webhook signature validation |
 
 Never commit `.env` — it is gitignored. Only `.env.example` belongs in the repo.
 
@@ -107,10 +112,11 @@ Open [http://localhost:5173](http://localhost:5173), sign in with Google, and de
 
 ```
 meetli/
-├── server/           # Express API (parse, auth, calendar)
+├── server/           # Express API (parse, auth, calendar, WhatsApp)
 │   ├── index.ts      # Routes and session setup
 │   ├── parseEvent.ts # OpenAI event extraction
 │   ├── googleAuth.ts # Google OAuth helpers
+│   ├── whatsapp/     # WhatsApp webhook and message handling
 │   └── ...
 ├── src/              # React frontend
 │   ├── components/   # Chat UI, auth button, event cards
@@ -119,6 +125,50 @@ meetli/
 ├── .env.example      # Environment variable template
 └── vite.config.ts    # Dev proxy to backend (/parse, /auth, /calendar)
 ```
+
+## WhatsApp bot
+
+Meetli can run as a WhatsApp bot using the [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api). Users message the bot in natural language, review the parsed event, sign in with Google via a link, and add events to their calendar.
+
+### Meta app setup
+
+1. In [Meta for Developers](https://developers.facebook.com/), open your app and add the **WhatsApp** product.
+2. Under **WhatsApp → API Setup**, copy:
+   - **Temporary access token** (or create a permanent System User token for production)
+   - **Phone number ID**
+3. Under **App settings → Basic**, copy the **App secret** (optional but recommended).
+4. Set webhook URL to your public backend:
+   ```
+   https://YOUR_PUBLIC_URL/webhooks/whatsapp
+   ```
+   Subscribe to the **messages** field.
+5. Set **Verify token** to the same value as `WHATSAPP_VERIFY_TOKEN` in `.env`.
+6. Add `BACKEND_URL=https://YOUR_PUBLIC_URL` so Google sign-in links work in chat.
+
+**Local development:** Meta cannot reach `localhost`. Use [ngrok](https://ngrok.com/) (or similar) to expose port 3001, then set `BACKEND_URL` to the ngrok HTTPS URL.
+
+### WhatsApp conversation flow
+
+```
+You: Team standup tomorrow at 9am for 15 minutes
+Bot: Here's what I understood: … [Add to calendar]
+You: (tap Add, or reply "add")
+Bot: ✅ Added to your calendar! View: https://...
+```
+
+- Reply with corrections ("make it 4pm") to refine the event.
+- Reply `new` to start over.
+- First-time users get a Google sign-in link before events can be added.
+
+### WhatsApp API routes
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/webhooks/whatsapp` | Meta webhook verification |
+| `POST` | `/webhooks/whatsapp` | Incoming WhatsApp messages |
+| `GET` | `/auth/google/whatsapp?waId=…` | Google OAuth for a WhatsApp user |
+
+User tokens and chat state are stored in `data/whatsapp-users.json` (gitignored).
 
 ## API overview
 

@@ -65,6 +65,28 @@
     "invalidMessage": "Missing or invalid message.",
     "createFailed": "Failed to create calendar event.",
     "authNotConfigured": "Google Calendar login is not configured.",
-    "signOutFailed": "Could not sign out."
+    "signOutFailed": "Could not sign out.",
+    "invalidDate": "Could not determine a valid event date. Please include when the event should happen.",
+    "invalidTime": "Could not determine a valid event time. Please include when the event should happen.",
+    "parseFailed": "Unable to parse event details. Please try rephrasing your request.",
+    "openAiNotConfigured": "OpenAI API key is not configured.",
+    "googleNoEventDetails": "Google Calendar did not return event details."
+  },
+  "whatsapp": {
+    "noEventToAdd": "No event to add yet. Describe an event first, for example: \"Team standup tomorrow at 9am for 15 minutes\".",
+    "signInToAdd": "Sign in with Google to add events to your calendar:\n{{url}}\n\nAfter signing in, reply \"add\" or tap Add to calendar.",
+    "addedToCalendar": "✅ Added to your calendar!\nView: {{link}}",
+    "createFailed": "Could not create the calendar event. Please try again.",
+    "tooShortFollowUp": "Tell me what to change, for example \"make it 4pm\".",
+    "tooShortInitial": "Please add more details so I can create your event.",
+    "signInFirst": "To add events to Google Calendar, sign in first:\n{{url}}",
+    "voiceNotUnderstood": "I could not understand the voice message. Please try again or send text.",
+    "voiceProcessFailed": "Could not process your voice message. Please try sending text instead.",
+    "reset": "Starting fresh. Describe your next event whenever you are ready.",
+    "unknownAction": "I did not recognize that action. Describe an event or reply \"add\".",
+    "authSuccessWithEvent": "You're signed in with Google! Reply \"add\" or tap Add to calendar to create your event.",
+    "authSuccess": "You're signed in with Google! Describe an event and I'll add it to your calendar.",
+    "addButton": "Add to calendar",
+    "eventFollowUp": "Reply with changes (e.g. \"make it 4pm\") or tap Add to calendar."
   }
 }

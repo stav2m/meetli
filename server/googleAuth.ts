@@ -31,14 +31,30 @@ export function createOAuth2Client() {
   );
 }
 
-export function getGoogleAuthUrl(): string {
+export function getGoogleAuthUrl(state?: string): string {
   const oauth2Client = createOAuth2Client();
 
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: CALENDAR_SCOPES,
     prompt: 'consent',
+    state,
   });
+}
+
+export function buildWhatsAppOAuthState(waId: string): string {
+  return `wa:${waId}`;
+}
+
+export function parseWhatsAppOAuthState(
+  state: string | undefined,
+): string | null {
+  if (!state?.startsWith('wa:')) {
+    return null;
+  }
+
+  const waId = state.slice(3).trim();
+  return waId || null;
 }
 
 export async function exchangeCodeForTokens(

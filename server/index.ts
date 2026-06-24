@@ -7,12 +7,24 @@ import {
   createGoogleCalendarEvent,
 } from './createCalendarEvent';
 import {
+  buildWhatsAppOAuthState,
   exchangeCodeForTokens,
   getGoogleAuthUrl,
+  parseWhatsAppOAuthState,
 } from './googleAuth';
 import { ParseEventError, parseEvent } from './parseEvent';
 import type { ParsedEvent } from './parseEvent';
 import { resolveTimeZone } from './timeZone';
+import {
+  isWhatsAppConfigured,
+  verifyWebhookChallenge,
+  verifyWebhookSignature,
+} from './whatsapp/api';
+import {
+  notifyWhatsAppAuthSuccess,
+  processWebhookPayload,
+} from './whatsapp/handler';
+import { setWhatsAppTokens } from './whatsapp/store';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -24,6 +36,50 @@ app.use(
     credentials: true,
   }),
 );
+
+app.get('/webhooks/whatsapp', (req, res) => {
+  const challenge = verifyWebhookChallenge(
+    typeof req.query['hub.mode'] === 'string' ? req.query['hub.mode'] : undefined,
+    typeof req.query['hub.verify_token'] === 'string'
+      ? req.query['hub.verify_token']
+      : undefined,
+    typeof req.query['hub.challenge'] === 'string'
+      ? req.query['hub.challenge']
+      : undefined,
+  );
+
+  if (challenge) {
+    res.status(200).send(challenge);
+    return;
+  }
+
+  res.sendStatus(403);
+});
+
+app.post(
+  '/webhooks/whatsapp',
+  express.raw({ type: 'application/json' }),
+  (req, res) => {
+    const rawBody = req.body as Buffer;
+
+    if (!verifyWebhookSignature(rawBody, req.get('x-hub-signature-256'))) {
+      res.sendStatus(403);
+      return;
+    }
+
+    res.sendStatus(200);
+
+    try {
+      const payload = JSON.parse(rawBody.toString('utf8')) as unknown;
+      void processWebhookPayload(payload).catch((err) => {
+        console.error('WhatsApp webhook processing error:', err);
+      });
+    } catch (err) {
+      console.error('WhatsApp webhook parse error:', err);
+    }
+  },
+);
+
 app.use(express.json());
 app.use(
   session({
@@ -65,20 +121,66 @@ app.get('/auth/google', (_req, res) => {
   }
 });
 
+app.get('/auth/google/whatsapp', (req, res) => {
+  const waId = typeof req.query.waId === 'string' ? req.query.waId.trim() : '';
+
+  if (!waId) {
+    res.status(400).send('Missing WhatsApp user id.');
+    return;
+  }
+
+  try {
+    res.redirect(getGoogleAuthUrl(buildWhatsAppOAuthState(waId)));
+  } catch (err) {
+    console.error('WhatsApp Google auth URL error:', err);
+    res.status(500).send('Google Calendar login is not configured.');
+  }
+});
+
 app.get('/auth/google/callback', async (req, res) => {
   const code = typeof req.query.code === 'string' ? req.query.code : null;
+  const waId = parseWhatsAppOAuthState(
+    typeof req.query.state === 'string' ? req.query.state : undefined,
+  );
 
   if (!code) {
+    if (waId) {
+      res.status(400).send('Google sign-in was cancelled or failed.');
+      return;
+    }
+
     res.redirect(`${FRONTEND_URL}?auth=error`);
     return;
   }
 
   try {
     const tokens = await exchangeCodeForTokens(code);
+
+    if (waId) {
+      await setWhatsAppTokens(waId, tokens);
+
+      if (isWhatsAppConfigured()) {
+        await notifyWhatsAppAuthSuccess(waId);
+      }
+
+      res
+        .status(200)
+        .send(
+          '<!DOCTYPE html><html><body style="font-family:sans-serif;text-align:center;padding:2rem"><h1>Signed in</h1><p>Return to WhatsApp to add your event.</p></body></html>',
+        );
+      return;
+    }
+
     req.session.googleTokens = tokens;
     res.redirect(`${FRONTEND_URL}?auth=success`);
   } catch (err) {
     console.error('Google auth callback error:', err);
+
+    if (waId) {
+      res.status(500).send('Google sign-in failed. Try again from WhatsApp.');
+      return;
+    }
+
     res.redirect(`${FRONTEND_URL}?auth=error`);
   }
 });
@@ -190,4 +292,12 @@ app.post('/calendar/events', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
+
+  if (isWhatsAppConfigured()) {
+    console.log('WhatsApp webhook: GET/POST /webhooks/whatsapp');
+  } else {
+    console.log(
+      'WhatsApp not configured (set WHATSAPP_TOKEN and WHATSAPP_PHONE_NUMBER_ID to enable).',
+    );
+  }
 });
