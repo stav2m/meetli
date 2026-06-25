@@ -9,8 +9,11 @@ Create Google Calendar events from natural language. Describe a meeting in plain
 <h2>Screenshots</h2>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/13349685-a9ce-44d8-92e3-a0f5b62732d1" width="35%" />
-  <img src="https://github.com/user-attachments/assets/0a5bc849-65db-4ec1-a6ba-d3c49f9653d8" width="25%" />
+  <img src="https://github.com/user-attachments/assets/4bd8ef5c-8f46-490d-aa0f-289bd066b805" width="24%" />
+  <img src="https://github.com/user-attachments/assets/ecf63e2d-05a0-4c9a-a0a3-729a323222bc" width="24%" />
+  <img src="https://github.com/user-attachments/assets/75458d8c-0952-47cf-ba46-bfb2cded0058" width="24%" />
+  <img src="https://github.com/user-attachments/assets/9981ff76-6119-4769-90f3-581884475fad" width="24%" />
+
 </p>
 
 
