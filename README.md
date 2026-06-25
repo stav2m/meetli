@@ -2,6 +2,11 @@
 
 Create Google Calendar events from natural language. Describe a meeting in plain text, review the parsed details, refine them in chat, and add the event to your personal or family calendar.
 
+<img width="854" height="480" alt="clideo_editor_6ecb43974c2a4f1e994efc3a275d73c9" src="https://github.com/user-attachments/assets/d83fbba2-a369-40f6-9868-d6e4a814d5df" />
+<img width="876" height="811" alt="צילום מסך 2026-06-25 ב-9 42 55" src="https://github.com/user-attachments/assets/13349685-a9ce-44d8-92e3-a0f5b62732d1" />
+<img width="626" height="928" alt="צילום מסך 2026-06-25 ב-10 48 31" src="https://github.com/user-attachments/assets/0a5bc849-65db-4ec1-a6ba-d3c49f9653d8" />
+
+
 ## Features
 
 - **Natural-language parsing** — OpenAI extracts title, date, time, duration, and target calendar from your message.
