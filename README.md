@@ -1,21 +1,22 @@
 # Meetli
+![React](https://img.shields.io/badge/React-19-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![OpenAI](https://img.shields.io/badge/OpenAI-GPT-green)
+![Google Calendar](https://img.shields.io/badge/Google%20Calendar-API-blue)
 
 Create Google Calendar events from natural language. Describe a meeting in plain text, review the parsed details, refine them in chat, and add the event to your personal or family calendar.
 
 <p align="center">
-  <!-- <img src="https://github.com/user-attachments/assets/d83fbba2-a369-40f6-9868-d6e4a814d5df" width="70%" /> -->
-<img width="35%" alt="Meetli - 25 June 20264" src="https://github.com/user-attachments/assets/b5939c1c-4e0c-45a0-bd75-da1469826a7b" />
-<img width="20%" alt="Screenrecorder-2026-06-25-11-42-14-9602" src="https://github.com/user-attachments/assets/c6144734-71f4-4bf9-afe3-27b30a1a2c0d" />
+<img width="30%" alt="Screenrecorder-2026-06-25-11-42-14-9602" src="https://github.com/user-attachments/assets/c6144734-71f4-4bf9-afe3-27b30a1a2c0d" />
 
 </p>
 
 <h2>Screenshots</h2>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/4bd8ef5c-8f46-490d-aa0f-289bd066b805" width="24%" />
-  <img src="https://github.com/user-attachments/assets/ecf63e2d-05a0-4c9a-a0a3-729a323222bc" width="24%" />
-  <img src="https://github.com/user-attachments/assets/75458d8c-0952-47cf-ba46-bfb2cded0058" width="24%" />
-  <img src="https://github.com/user-attachments/assets/9981ff76-6119-4769-90f3-581884475fad" width="24%" />
+  <img src="https://github.com/user-attachments/assets/ecf63e2d-05a0-4c9a-a0a3-729a323222bc" width="25%" />
+  <img src="https://github.com/user-attachments/assets/75458d8c-0952-47cf-ba46-bfb2cded0058" width="25%" />
+  <img src="https://github.com/user-attachments/assets/9981ff76-6119-4769-90f3-581884475fad" width="25%" />
 
 </p>
 
@@ -28,6 +29,15 @@ Create Google Calendar events from natural language. Describe a meeting in plain
 - **Personal & family calendars** — Routes events to your primary calendar or a shared family calendar when you ask for it.
 - **Timezone-aware** — Uses the browser timezone when parsing dates and times.
 
+## Architecture
+
+- React frontend
+- Express API
+- OpenAI event extraction
+- Google OAuth
+- Google Calendar API
+- WhatsApp Cloud API
+  
 ## Tech stack
 
 - **Frontend:** React 19, TypeScript, Vite, Material UI
@@ -207,3 +217,7 @@ In development, the Vite dev server proxies these paths to `localhost:3001`.
 - Use a strong, unique `SESSION_SECRET`.
 - Update `FRONTEND_URL`, `GOOGLE_REDIRECT_URI`, and Google Cloud authorized origins/redirect URIs for your deployed URLs.
 - Serve the built frontend (`dist/`) and run the Express server, or deploy frontend and backend separately with matching CORS/proxy configuration.
+
+## Live Demo
+
+Coming soon.
