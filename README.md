@@ -3,7 +3,10 @@
 Create Google Calendar events from natural language. Describe a meeting in plain text, review the parsed details, refine them in chat, and add the event to your personal or family calendar.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/d83fbba2-a369-40f6-9868-d6e4a814d5df" width="70%" />
+  <!-- <img src="https://github.com/user-attachments/assets/d83fbba2-a369-40f6-9868-d6e4a814d5df" width="70%" /> -->
+<img width="35%" alt="Meetli - 25 June 20264" src="https://github.com/user-attachments/assets/b5939c1c-4e0c-45a0-bd75-da1469826a7b" />
+<img width="20%" alt="Screenrecorder-2026-06-25-11-42-14-9602" src="https://github.com/user-attachments/assets/c6144734-71f4-4bf9-afe3-27b30a1a2c0d" />
+
 </p>
 
 <h2>Screenshots</h2>
